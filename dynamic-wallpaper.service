@@ -1,0 +1,11 @@
+[Unit]
+Description=Set dynamic wallpaper
+Wants=graphical-session.target
+After=graphical-session.target network.target
+
+[Service]
+Type=simple
+ExecStart=/home/v/bin/dynamic_wallpaper.py
+
+[Install]
+WantedBy=default.target
