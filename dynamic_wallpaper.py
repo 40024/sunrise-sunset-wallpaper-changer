@@ -10,7 +10,7 @@ import json
 import logging
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 
 def gse(api_info: dict, event_wanted: str) -> time:
