@@ -3,8 +3,6 @@
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 import subprocess
-import sys
-from pathlib import Path
 import requests
 import json
 import logging
@@ -16,6 +14,7 @@ logging.basicConfig(level=logging.WARNING)
 def gse(api_info: dict, event_wanted: str) -> time:
     """
     Retrieve solar time for event
+
     Args:
         event_wanted: Specific solar event to retrieve time for
     Returns:
@@ -43,9 +42,14 @@ def gse(api_info: dict, event_wanted: str) -> time:
     return time_obj
 
 
-def now_period(PERIODS, datetime_obj: datetime) -> str:
+def now_period(periods, datetime_obj: datetime) -> str:
+    """
+    Returns one of the following depending on time
+        "dawn" "day" "dusk" "night"
+    """
     time = datetime_obj.time()
-    for name, (start, end) in PERIODS.items():
+
+    for name, (start, end) in periods.items():
         # Check for midnight
         if start <= end:
             if start <= time < end:
@@ -56,16 +60,18 @@ def now_period(PERIODS, datetime_obj: datetime) -> str:
             if time >= start or time < end:
                 logging.debug(f"Midnight wrap Time {time} detected as: {name}")
                 return name
+
     return "night"
 
 
-def read_last(STATE_FILE) -> str | None:
-    return STATE_FILE.read_text().strip()
-
-
-def write_last(STATE_FILE, path: str):
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text(path)
+def get_current_wallpapers() -> list[str]:
+    """
+    Monitors may have their own wallpaper
+    So we get a list of wallpapers for each monitor
+    """
+    stdout = subprocess.run(["swww", "query"], capture_output=True, text=True).stdout
+    lines = stdout.splitlines()
+    return [line.split(" ")[-1] for line in lines]
 
 
 def set_wallpaper(path: str) -> int:
@@ -74,8 +80,13 @@ def set_wallpaper(path: str) -> int:
     return res.returncode
 
 
+def get_wallpaper_filename(wallpaper_path: str) -> str:
+    return wallpaper_path.split("/")[-1]
+
+
 def main():
     # TODO cache api call, currently made every MINUTE
+    # TODO and fall back to sensible defaults if offline
     r = requests.get(
         "https://api.sunrisesunset.io/json?lat=37.3346&lng=-122.0090&timezone=lax"
     )
@@ -89,6 +100,7 @@ def main():
         "night": "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Night.png",
     }
 
+    # TODO should've just been an object
     # Define periods intervals
     PERIODS = {
         "dawn":  (gse(api_info, "first_light"), gse(api_info, "sunrise")),
@@ -98,27 +110,29 @@ def main():
     }
 
     TZ = ZoneInfo("America/Los_Angeles")
-    STATE_FILE = Path.home() / ".cache" / "dynamic_wallpaper_last"
 
     datetime_obj = datetime.now(TZ)
     period = now_period(PERIODS, datetime_obj)
 
-    wallpaper = WALLPAPERS.get(period)
-    if not wallpaper:
+    expected_wallpaper = WALLPAPERS.get(period, None)
+
+    if not expected_wallpaper:
         logging.error(f"No wallpaper configured for period {period}")
         return 2
 
-    last = read_last(STATE_FILE)
-    if last == period:
-        print(
-            "Dynamic wallpaper ran, but current wallpaper matches what it should be for period, not changing wallpaper"
-        )
-        return 0
-    return_code = set_wallpaper(wallpaper)
-    if return_code == 0:
-        write_last(STATE_FILE, period)
-    else:
-        sys.exit(return_code)
+    current_wallpapers = get_current_wallpapers()
+
+    for current_wallpaper in current_wallpapers:
+        wallpaper_filename = get_wallpaper_filename(expected_wallpaper)
+
+        if current_wallpaper != expected_wallpaper:
+            print(f"Changing wallpaper to {wallpaper_filename} from {get_wallpaper_filename(current_wallpaper)}")
+            return_code = set_wallpaper(expected_wallpaper)
+
+            if return_code != 0:
+                logging.error(f"Err with {return_code}")
+        else:
+            print(f"Wallpaper {wallpaper_filename} matches what it should be for period {period}")
 
 
 if __name__ == "__main__":
