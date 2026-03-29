@@ -100,6 +100,7 @@ def main():
         "night": "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Night.png",
     }
 
+    # TODO should've just been an object
     # Define periods intervals
     PERIODS = {
         "dawn":  (gse(api_info, "first_light"), gse(api_info, "sunrise")),
