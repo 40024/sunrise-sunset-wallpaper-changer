@@ -69,13 +69,13 @@ def get_current_wallpapers() -> list[str]:
     Monitors may have their own wallpaper
     So we get a list of wallpapers for each monitor
     """
-    stdout = subprocess.run(["swww", "query"], capture_output=True, text=True).stdout
+    stdout = subprocess.run(["awww", "query"], capture_output=True, text=True).stdout
     lines = stdout.splitlines()
     return [line.split(" ")[-1] for line in lines]
 
 
 def set_wallpaper(path: str) -> int:
-    cmd = ["/usr/bin/swww", "img", path]
+    cmd = ["/usr/bin/awww", "img", path]
     res = subprocess.run(cmd, check=False)
     return res.returncode
 
