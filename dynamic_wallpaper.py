@@ -96,10 +96,10 @@ def main():
     # Detect first run with a ~./config/ss_wallpaper_changer/state_file
     # Map period names to image paths (full paths)
     WALLPAPERS = {
-        "dawn":  "~/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dawn.jpg",
-        "day":   "~/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Day.jpg",
-        "dusk":  "~/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dusk.jpg",
-        "night": "~/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Night.jpg",
+        "dawn":  "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dawn.png",
+        "day":   "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Day.png",
+        "dusk":  "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dusk.png",
+        "night": "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Night.png",
     }
 
     # TODO should've just been an object
