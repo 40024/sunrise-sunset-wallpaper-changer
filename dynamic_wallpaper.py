@@ -91,6 +91,7 @@ def get_displays() -> list[Display]:
     return displays
 
 
+# TODO support mpvpaper for video
 def set_wallpaper(path: str) -> int:
     cmd = ["/usr/bin/awww", "img", path]
     res = subprocess.run(cmd, check=False)

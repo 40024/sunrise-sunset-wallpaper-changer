@@ -5,7 +5,7 @@ Python script that dynamically changes wallpaper depending on dawn, day, dusk, n
 I couldn't find anything that did this elegantly already on my linux environment
 
 # What to adjust
-Create service files like example files in this repo (suggested path ~/.config/systemd/user), and start with something like: 
+Create service files like example files in this repo (suggested path ~/.config/systemd/user), and start with something like:
     `systemctl --user daemon-reload`
     `systemctl --user enable dynamic-wallpaper.service`
 WALLPAPERS mapping depending on what wallpapers you want
