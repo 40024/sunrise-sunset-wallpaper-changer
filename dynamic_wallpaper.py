@@ -11,6 +11,17 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 
 
+class Display:
+    def __init__(self, line) -> None:
+        self.display_id = self._get_display_id(line)
+        self.display_image = line.split(" ")[-1]
+
+    def _get_display_id(self, line):
+        display_id_raw = line.split(" ")[1]
+        display_id = f"{display_id_raw[:-1]}"
+        return display_id
+
+
 def gse(api_info: dict, event_wanted: str) -> time:
     """
     Retrieve solar time for event
@@ -64,14 +75,20 @@ def now_period(periods, datetime_obj: datetime) -> str:
     return "night"
 
 
-def get_current_wallpapers() -> list[str]:
+def get_displays() -> list[Display]:
     """
     Monitors may have their own wallpaper
     So we get a list of wallpapers for each monitor
     """
     stdout = subprocess.run(["awww", "query"], capture_output=True, text=True).stdout
     lines = stdout.splitlines()
-    return [line.split(" ")[-1] for line in lines]
+
+    displays = list()
+
+    for line in lines:
+        displays.append(Display(line))
+
+    return displays
 
 
 def set_wallpaper(path: str) -> int:
@@ -122,19 +139,19 @@ def main():
         logging.error(f"No wallpaper configured for period {period}")
         return 2
 
-    current_wallpapers = get_current_wallpapers()
+    displays = get_displays()
 
-    for current_wallpaper in current_wallpapers:
+    for display in displays:
         wallpaper_filename = get_wallpaper_filename(expected_wallpaper)
 
-        if current_wallpaper != expected_wallpaper:
-            print(f"Changing wallpaper to {wallpaper_filename} from {get_wallpaper_filename(current_wallpaper)}")
+        if display.display_image != expected_wallpaper:
+            print(f"Changing wallpaper to {wallpaper_filename} from {get_wallpaper_filename(display.display_image)}")
             return_code = set_wallpaper(expected_wallpaper)
 
             if return_code != 0:
                 logging.error(f"Err with {return_code}")
         else:
-            print(f"Wallpaper {wallpaper_filename} matches what it should be for period {period}")
+            print(f"Wallpaper {wallpaper_filename} matches what it should be for period {period} for monitor {display.display_id}")
 
 
 if __name__ == "__main__":
