@@ -114,10 +114,10 @@ def main():
     # Detect first run with a ~./config/ss_wallpaper_changer/state_file
     # Map period names to image paths (full paths)
     WALLPAPERS = {
-        "dawn":  "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dawn.png",
-        "day":   "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Day.png",
-        "dusk":  "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Dusk.png",
-        "night": "/home/v/Pictures/Wallpapers/Tahoe/26-Tahoe-Beach-Night.png",
+        "dawn":  "/home/v/Pictures/Wallpapers/_Tahoe/26-Tahoe-Beach-Dawn.png",
+        "day":   "/home/v/Pictures/Wallpapers/_Tahoe/26-Tahoe-Beach-Day.png",
+        "dusk":  "/home/v/Pictures/Wallpapers/_Tahoe/26-Tahoe-Beach-Dusk.png",
+        "night": "/home/v/Pictures/Wallpapers/_Tahoe/26-Tahoe-Beach-Night.png",
     }
 
     # TODO should've just been an object
@@ -146,7 +146,7 @@ def main():
         wallpaper_filename = get_wallpaper_filename(expected_wallpaper)
 
         if display.display_image != expected_wallpaper:
-            print(f"Changing wallpaper to {wallpaper_filename} from {get_wallpaper_filename(display.display_image)}")
+            print(f"Changing wallpaper to {wallpaper_filename} from {get_wallpaper_filename(display.display_image)} on {display.display_id}")
             return_code = set_wallpaper(expected_wallpaper)
 
             if return_code != 0:
